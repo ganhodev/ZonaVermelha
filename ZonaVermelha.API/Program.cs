@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ZonaVermelhaDbContext>(options => options.UseSqlite(connectionString));
 
 var app = builder.Build();
 

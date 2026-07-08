@@ -1,8 +1,12 @@
-﻿namespace ZonaVermelha.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ZonaVermelha.Domain;
 
 public class Relato(string descricao, double latitude, double longitude, Guid usuarioId)
 {
     //criar identificadores únicos
+
+    [Key]
     public Guid IdRelato { get; set; } = Guid.NewGuid();
     public string Descricao { get; set; } = descricao;
     public double Latitude { get; set; } = latitude;

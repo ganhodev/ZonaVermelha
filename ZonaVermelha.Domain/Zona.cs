@@ -1,7 +1,10 @@
-﻿namespace ZonaVermelha.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ZonaVermelha.Domain;
 
 public class Zona(double latitude, double longitude)
 {
+    [Key]
     public Guid IdZona { get; set; } = Guid.NewGuid();
     public double Latitude { get; set; } = latitude;
     public double Longitude { get; set; } = longitude;
