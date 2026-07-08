@@ -1,3 +1,10 @@
 <Solution>
+  <Folder Name="/Itens de Solução/">
+    <File Path=".gitignore" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="ZonaVermelha.API/ZonaVermelha.API.csproj" />
+  <Project Path="ZonaVermelha.Communication/ZonaVermelha.Communication.csproj" />
+  <Project Path="ZonaVermelha.Domain/ZonaVermelha.Domain.csproj" />
+  <Project Path="ZonaVermelha.Infrastructure/ZonaVermelha.Infrastructure.csproj" />
 </Solution>

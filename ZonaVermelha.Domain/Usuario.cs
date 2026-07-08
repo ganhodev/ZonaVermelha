@@ -1,10 +1,9 @@
 ﻿namespace ZonaVermelha.Domain;
 
-public class Usuario
+public class Usuario(string nome, string email)
 {
-    public Guid IdUsuario{ get; set; }
-    public string Nome { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-
+    public Guid IdUsuario{ get; set; } = Guid.NewGuid();
+    public string Nome { get; set; } = nome;
+    public string Email { get; set; } = email;
     public ICollection<Relato> Relatos { get; set; } = [];
 }
