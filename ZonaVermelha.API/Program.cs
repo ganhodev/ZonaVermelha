@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.API.Services;
 using ZonaVermelha.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ZonaVermelhaDbContext>(options => options.UseSqlite(connectionString));
+
+//Scoped: cria uma instância nova por requisição HTTP. É o padrão pra serviços que usam DbContext.
+builder.Services.AddScoped<RelatoService>();
 
 var app = builder.Build();
 
