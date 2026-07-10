@@ -1,7 +1,7 @@
 ﻿using ZonaVermelha.Communication.Requests;
 using ZonaVermelha.Communication.Responses;
 using ZonaVermelha.Infrastructure;
- using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ZonaVermelha.Domain;
 
 namespace ZonaVermelha.API.Services;

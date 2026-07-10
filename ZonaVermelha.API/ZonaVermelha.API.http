@@ -1,6 +1,36 @@
 @ZonaVermelha.API_HostAddress = http://localhost:5083
 
-GET {{ZonaVermelha.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### 1. Criar usuário
+POST {{ZonaVermelha.API_HostAddress}}/api/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Guilherme",
+  "email": "guilherme@email.com"
+}
 
 ###
+
+### 2. Criar relato (usar o id retornado no passo 1)
+POST {{ZonaVermelha.API_HostAddress}}/api/relatos
+Content-Type: application/json
+
+{
+  "descricao": "Assalto a mão armada, homem de camisa vermelha",
+  "latitude": -20.2900,
+  "longitude": -40.2925,
+  "usuarioId": "SEU-USUARIO-ID-AQUI"
+}
+
+###
+
+### 3. Segundo relato próximo (deve agrupar na mesma zona)
+POST {{ZonaVermelha.API_HostAddress}}/api/relatos
+Content-Type: application/json
+
+{
+  "descricao": "Roubo de celular, suspeito fugiu correndo",
+  "latitude": -20.2905,
+  "longitude": -40.2925,
+  "usuarioId": "SEU-USUARIO-ID-AQUI"
+}
