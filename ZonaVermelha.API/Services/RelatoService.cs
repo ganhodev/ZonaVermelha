@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.API.Hubs;
 using ZonaVermelha.Communication.Requests;
 using ZonaVermelha.Communication.Responses;
 using ZonaVermelha.Domain;
@@ -7,7 +9,7 @@ using ZonaVermelha.Infrastructure;
 
 namespace ZonaVermelha.API.Services;
 //async/await permite que a thread não fique bloqueada esperando.
-public class RelatoService(ZonaVermelhaDbContext dbContext)
+public class RelatoService(ZonaVermelhaDbContext dbContext, IHubContext<ZonasHub> hubContext)
 {
     public async Task<ResponseRelatoJson> CriarRelatoAsync(RequestRelatoJson requestRelatoJson)
     {
@@ -80,6 +82,19 @@ public class RelatoService(ZonaVermelhaDbContext dbContext)
 
         await dbContext.SaveChangesAsync();
 
+
+        await hubContext.Clients
+    .Group(zonaFinal.IdZona.ToString())
+    .SendAsync("ZonaAtualizada", new
+    {
+        zonaFinal.IdZona,
+        zonaFinal.Latitude,
+        zonaFinal.Longitude,
+        zonaFinal.NivelIntensidadeZona,
+        zonaFinal.UltimaAtividade
+    });
+
+        //Notifica todos os clientes que estão no grupo da zona(com os dados atualizados da zona)
         return new ResponseRelatoJson
         {
             IdRelato = relato.IdRelato,

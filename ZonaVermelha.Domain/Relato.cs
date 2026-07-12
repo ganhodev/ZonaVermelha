@@ -13,6 +13,6 @@ public class Relato(string descricao, double latitude, double longitude, Guid us
     public double Longitude { get; set; } = longitude;
     public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
     public Guid UsuarioId { get; set; } = usuarioId;
-    public Guid ZonaId { get; set; }
+    public Guid? ZonaId { get; set; }
     public Zona Zona { get; set; } = null!;
 }

@@ -7,5 +7,5 @@ public class ResponseRelatoJson
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public DateTime CriadoEm { get; set; }
-    public Guid ZonaId { get; set; }
+    public Guid? ZonaId { get; set; }
 }

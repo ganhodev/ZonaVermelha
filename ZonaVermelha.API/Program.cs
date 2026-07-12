@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.API.BackgroundServices;
 using ZonaVermelha.API.Hubs;
 using ZonaVermelha.API.Middlewares;
 using ZonaVermelha.API.Services;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddHostedService<ZonaExpiracaoService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
