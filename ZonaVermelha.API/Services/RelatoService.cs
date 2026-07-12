@@ -1,8 +1,9 @@
-﻿using ZonaVermelha.Communication.Requests;
+﻿using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.Communication.Requests;
 using ZonaVermelha.Communication.Responses;
-using ZonaVermelha.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using ZonaVermelha.Domain;
+using ZonaVermelha.Domain.Exceptions;
+using ZonaVermelha.Infrastructure;
 
 namespace ZonaVermelha.API.Services;
 //async/await permite que a thread não fique bloqueada esperando.
@@ -10,8 +11,34 @@ public class RelatoService(ZonaVermelhaDbContext dbContext)
 {
     public async Task<ResponseRelatoJson> CriarRelatoAsync(RequestRelatoJson requestRelatoJson)
     {
-        var zonas = await dbContext.Zonas.ToListAsync();
+        //Validação dos dados de entrada
+        var erros = new List<string>();
 
+        if (string.IsNullOrWhiteSpace(requestRelatoJson.Descricao))
+            erros.Add("Descrição é obrigatória.");
+
+        if (requestRelatoJson.Latitude < -90 || requestRelatoJson.Latitude > 90)
+            erros.Add("Latitude deve estar entre -90 e 90.");
+
+        if (requestRelatoJson.Longitude < -180 || requestRelatoJson.Longitude > 180)
+            erros.Add("Longitude deve estar entre -180 e 180.");
+
+        if (requestRelatoJson.UsuarioId == Guid.Empty)
+            erros.Add("UsuarioId é obrigatório.");
+
+        if (erros.Count > 0)
+            throw new ValidacaoException(erros);
+
+
+        //Verificar se o usuário existe
+        var usuarioExiste = await dbContext.Usuarios
+        .AnyAsync(u => u.IdUsuario == requestRelatoJson.UsuarioId);
+
+        if (!usuarioExiste)
+            throw new NotFoundException("Usuário não encontrado.");
+
+
+        var zonas = await dbContext.Zonas.ToListAsync();
         //Aqui fica um objeto anônimo com { Zona, Distancia }, se encontrou alguma zona dentro do raio
         //null, se nenhuma zona satisfez a condição do .Where()
 

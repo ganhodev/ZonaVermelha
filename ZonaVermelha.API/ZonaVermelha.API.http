@@ -37,3 +37,29 @@ Content-Type: application/json
 
 ### Buscar zonas próximas
 GET {{ZonaVermelha.API_HostAddress}}/api/zonas?latitude=-20.2900&longitude=-40.2925
+
+
+
+### Teste 1: Descrição vazia (deve retornar 400)
+POST {{ZonaVermelha.API_HostAddress}}/api/relatos
+Content-Type: application/json
+
+{
+  "descricao": "",
+  "latitude": -20.2900,
+  "longitude": -40.2925,
+  "usuarioId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+###
+
+### Teste 2: Usuário inexistente (deve retornar 404)
+POST {{ZonaVermelha.API_HostAddress}}/api/relatos
+Content-Type: application/json
+
+{
+  "descricao": "Assalto",
+  "latitude": -20.2900,
+  "longitude": -40.2925,
+  "usuarioId": "00000000-0000-0000-0000-000000000001"
+}

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.API.Middlewares;
 using ZonaVermelha.API.Services;
 using ZonaVermelha.Infrastructure;
 
@@ -25,6 +26,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
