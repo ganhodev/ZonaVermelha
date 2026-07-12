@@ -39,7 +39,6 @@ Content-Type: application/json
 GET {{ZonaVermelha.API_HostAddress}}/api/zonas?latitude=-20.2900&longitude=-40.2925
 
 
-
 ### Teste 1: Descrição vazia (deve retornar 400)
 POST {{ZonaVermelha.API_HostAddress}}/api/relatos
 Content-Type: application/json

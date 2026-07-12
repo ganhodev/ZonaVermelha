@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ZonaVermelha.API.Hubs;
 using ZonaVermelha.API.Middlewares;
 using ZonaVermelha.API.Services;
 using ZonaVermelha.Infrastructure;
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -34,5 +37,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ZonasHub>("/hubs/zonas");
 
 app.Run();
