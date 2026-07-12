@@ -34,3 +34,6 @@ Content-Type: application/json
   "longitude": -40.2925,
   "usuarioId": "SEU-USUARIO-ID-AQUI"
 }
+
+### Buscar zonas próximas
+GET {{ZonaVermelha.API_HostAddress}}/api/zonas?latitude=-20.2900&longitude=-40.2925

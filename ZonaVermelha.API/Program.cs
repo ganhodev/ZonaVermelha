@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ZonaVermelhaDbContext>(options => options.UseSqlit
 //Scoped: cria uma instância nova por requisição HTTP. É o padrão pra serviços que usam DbContext.
 builder.Services.AddScoped<RelatoService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ZonaService>();
 
 var app = builder.Build();
 
