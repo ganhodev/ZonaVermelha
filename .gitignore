@@ -6,3 +6,5 @@ obj/
 *.db-wal
 
 echo -e "\n# SQLite temporary files\n*.db-shm\n*.db-wal" >> .gitignore
+
+echo "*.csproj.user" >> .gitignore
