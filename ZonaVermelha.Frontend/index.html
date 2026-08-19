@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zona Vermelha</title>
+
+    <!-- Leaflet CSS (mapa) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Seu CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div id="painel">
+        <h2>🔴 Zona Vermelha</h2>
+
+        <div id="formulario">
+            <h3>Registrar Ocorrência</h3>
+
+            <input type="text" id="input-usuario" placeholder="Seu ID de usuário" />
+
+            <textarea id="input-descricao" placeholder="Descreva a ocorrência..." rows="4"></textarea>
+
+            <button id="btn-usar-localizacao">📍 Usar minha localização</button>
+
+            <span id="texto-coordenadas">Nenhuma localização selecionada</span>
+
+            <button id="btn-enviar">Registrar Relato</button>
+        </div>
+    </div>
+
+    <div id="mapa"></div>
+
+    <!-- Leaflet JS (mapa) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- SignalR client -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+    <!-- Seu JS -->
+    <script src="app.js"></script>
+
+</body>
+</html>
