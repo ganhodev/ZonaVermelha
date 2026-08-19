@@ -1,8 +1,16 @@
 # 🔴 Zona Vermelha
 
-Aplicação backend de mapeamento colaborativo de áreas de risco, onde usuários podem registrar ocorrências criminais (assaltos, roubos, furtos) próximas à sua localização. Relatos próximos entre si formam **zonas vermelhas** no mapa, que aumentam de intensidade conforme novos relatos chegam e desaparecem automaticamente após 6 horas sem atividade.
+Aplicação de mapeamento colaborativo de áreas de risco, onde usuários podem registrar ocorrências criminais (assaltos, roubos, furtos) próximas à sua localização. Relatos próximos entre si formam **zonas vermelhas** no mapa, que aumentam de intensidade conforme novos relatos chegam e desaparecem automaticamente após 6 horas sem atividade.
 
 > Projeto desenvolvido como primeiro projeto real, com foco em aprendizado prático de arquitetura em camadas, geolocalização, comunicação em tempo real e boas práticas de desenvolvimento backend em .NET 10.
+
+---
+
+## 📸 Preview
+
+![Preview do Zona Vermelha](./imagemFinal.png)
+
+> Mapa interativo centrado em Vitória-ES com zona de risco ativa registrada em tempo real via SignalR.
 
 ---
 
@@ -10,25 +18,30 @@ Aplicação backend de mapeamento colaborativo de áreas de risco, onde usuário
 
 - Registro de relatos de crimes com descrição e localização (lat/lng)
 - Agrupamento automático de relatos próximos em zonas (raio de 200m, via fórmula de Haversine)
-- Intensidade da zona aumenta a cada novo relato associado
+- Intensidade da zona aumenta a cada novo relato associado (amarelo → laranja → vermelho)
 - Busca de zonas ativas próximas a uma coordenada (raio de 5km)
 - Notificações em tempo real via SignalR quando zonas surgem ou se intensificam
 - Expiração automática de zonas sem atividade há mais de 6 horas
 - Histórico de relatos preservado mesmo após expiração da zona
 - Tratamento de erros global com respostas JSON padronizadas
+- Mapa interativo com Leaflet.js + OpenStreetMap
 
 ---
 
 ## Arquitetura
 
-A solução segue o padrão de **arquitetura em camadas**, com 4 projetos separados por responsabilidade:
+A solução segue o padrão de **arquitetura em camadas**, com 4 projetos de backend separados por responsabilidade, mais o frontend:
 
 ```
 ZonaVermelha/
-├── ZonaVermelha.API           → Controllers, Services, Middlewares, Hubs, BackgroundService
-├── ZonaVermelha.Domain        → Entidades, regras de negócio, exceções customizadas
+├── ZonaVermelha.API            → Controllers, Services, Middlewares, Hubs, BackgroundService
+├── ZonaVermelha.Domain         → Entidades, regras de negócio, exceções customizadas
 ├── ZonaVermelha.Infrastructure → DbContext, EF Core, migrations, acesso a dados
-└── ZonaVermelha.Communication → DTOs de request/response (contratos da API)
+├── ZonaVermelha.Communication  → DTOs de request/response (contratos da API)
+└── ZonaVermelha.Frontend/      → Interface web (HTML, CSS, JavaScript puro)
+    ├── index.html
+    ├── style.css
+    └── app.js
 ```
 
 ### Por que essa separação?
@@ -37,8 +50,6 @@ ZonaVermelha/
 - **Infrastructure** conhece o Domain, mas o Domain não sabe que ela existe
 - **Communication** define o contrato público da API sem expor entidades internas
 - **API** orquestra tudo — é a única camada que conhece as outras três
-
-Essa separação permite, por exemplo, trocar o SQLite por PostgreSQL alterando só o `Infrastructure`, sem tocar em nenhuma outra camada.
 
 ---
 
@@ -59,13 +70,21 @@ Fluxo de um novo relato:
 5. Salva no banco e notifica clientes via SignalR
 ```
 
+### Intensidade visual das zonas
+
+| Nível | Cor | Significado |
+|---|---|---|
+| 1-2 | 🟡 Amarelo | Poucos relatos, área de atenção |
+| 3-4 | 🟠 Laranja | Múltiplos relatos, área de risco |
+| 5+ | 🔴 Vermelho | Muitos relatos, área de alto risco |
+
 ### Expiração automática de zonas
 
 Um `BackgroundService` (`ZonaExpiracaoService`) roda a cada 5 minutos e verifica zonas cuja `UltimaAtividade` foi há mais de 6 horas. Ao expirar uma zona:
 
 - Os **relatos históricos são preservados** (`ZonaId` é setado para `null`, não deletado)
 - A zona é removida do banco
-- Clientes conectados são notificados via SignalR com o evento `ZonaExpirada`
+- Clientes conectados são notificados via SignalR com o evento `ZonaExpirada` (círculo some do mapa automaticamente)
 
 ### Tratamento de erros
 
@@ -91,6 +110,7 @@ O `BackgroundService` usa `IServiceProvider` para criar escopos manualmente a ca
 
 ## Stack técnica
 
+### Backend
 | Tecnologia | Uso |
 |---|---|
 | .NET 10 | Plataforma |
@@ -99,6 +119,14 @@ O `BackgroundService` usa `IServiceProvider` para criar escopos manualmente a ca
 | SQLite | Banco de dados |
 | SignalR | Comunicação em tempo real (WebSocket) |
 | BackgroundService | Expiração automática de zonas |
+
+### Frontend
+| Tecnologia | Uso |
+|---|---|
+| HTML/CSS/JavaScript | Interface web sem frameworks |
+| Leaflet.js | Mapa interativo |
+| OpenStreetMap | Tiles do mapa (gratuito) |
+| SignalR JS Client | Conexão em tempo real com o backend |
 
 ---
 
@@ -150,8 +178,6 @@ Retorna todas as zonas ativas dentro de 5km da coordenada informada.
 
 O Hub está disponível em `/hubs/zonas`.
 
-### Eventos disponíveis
-
 | Evento | Direção | Payload | Quando |
 |---|---|---|---|
 | `EntrarNaRegiao(regiaoId)` | Cliente → Servidor | string | Cliente entra num grupo de zona |
@@ -165,9 +191,10 @@ O Hub está disponível em `/hubs/zonas`.
 ### Pré-requisitos
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- Visual Studio 2022+ ou VS Code
+- Visual Studio 2022+ (para o backend)
+- [VS Code](https://code.visualstudio.com/) com extensão [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) (para o frontend)
 
-### Passos
+### Backend
 
 1. Clone o repositório:
 ```bash
@@ -176,48 +203,69 @@ cd ZonaVermelha
 ```
 
 2. Aplique as migrations (cria o banco SQLite automaticamente):
-```bash
-cd ZonaVermelha.API
-dotnet ef database update --project ../ZonaVermelha.Infrastructure
+
+No Console do Gerenciador de Pacotes do Visual Studio (projeto padrão: `ZonaVermelha.Infrastructure`):
+```
+Update-Database -StartupProject ZonaVermelha.API
 ```
 
-3. Rode a aplicação:
-```bash
-dotnet run
+3. Rode a API:
+```
+Ctrl+F5 no Visual Studio
 ```
 
 A API estará disponível em `http://localhost:5083`.
 
+### Frontend
+
+1. Abra a pasta `ZonaVermelha.Frontend` no VS Code
+2. Clique com botão direito no `index.html` → **Open with Live Server**
+3. Acesse `http://127.0.0.1:5500`
+
 ### Testando com o arquivo `.http`
 
-O projeto inclui `ZonaVermelha.API.http` com exemplos de todas as requisições. No Visual Studio, abra o arquivo e clique em **Enviar solicitação** acima de cada request.
+O projeto inclui `ZonaVermelha.API.http` com exemplos de todas as requisições.
 
-Fluxo recomendado para teste:
+Fluxo recomendado:
 1. `POST /api/usuarios` — crie um usuário e copie o `id` retornado
-2. `POST /api/relatos` — crie um relato usando o `id` do passo anterior
-3. `POST /api/relatos` — crie outro relato com coordenadas próximas (deve retornar o mesmo `zonaId`)
-4. `GET /api/zonas?latitude=...&longitude=...` — busque as zonas ativas
+2. Cole o `id` no campo "Seu ID de usuário" no frontend
+3. Clique no mapa para selecionar uma localização
+4. Preencha a descrição e clique em **Registrar Relato**
+5. O círculo aparece no mapa em tempo real via SignalR
 
 ---
 
-## Estrutura de pastas (ZonaVermelha.API)
+## Estrutura de pastas
 
 ```
 ZonaVermelha.API/
 ├── BackgroundServices/
-│   └── ZonaExpiracaoService.cs   → Expiração automática de zonas (a cada 5min)
+│   └── ZonaExpiracaoService.cs    → Expiração automática de zonas (a cada 5min)
 ├── Controllers/
-│   ├── RelatosController.cs      → POST /api/relatos
-│   ├── UsuariosController.cs     → POST /api/usuarios
-│   └── ZonasController.cs        → GET /api/zonas
+│   ├── RelatosController.cs       → POST /api/relatos
+│   ├── UsuariosController.cs      → POST /api/usuarios
+│   └── ZonasController.cs         → GET /api/zonas
 ├── Hubs/
-│   └── ZonasHub.cs               → Hub SignalR para notificações em tempo real
+│   └── ZonasHub.cs                → Hub SignalR para notificações em tempo real
 ├── Middlewares/
 │   └── ErrorHandlingMiddleware.cs → Tratamento global de exceções
 └── Services/
-    ├── RelatoService.cs           → Lógica de criação de relatos e agrupamento
-    ├── UsuarioService.cs          → Lógica de criação de usuários
-    └── ZonaService.cs             → Lógica de busca de zonas por proximidade
+    ├── RelatoService.cs            → Lógica de criação de relatos e agrupamento
+    ├── UsuarioService.cs           → Lógica de criação de usuários
+    └── ZonaService.cs              → Lógica de busca de zonas por proximidade
+
+ZonaVermelha.Domain/
+├── CalculadoraDistancia.cs        → Fórmula de Haversine
+├── Exceptions/
+│   ├── ZonaVermelhaException.cs
+│   ├── ValidacaoException.cs
+│   └── NotFoundException.cs
+└── Entidades: Relato.cs, Zona.cs, Usuario.cs
+
+ZonaVermelha.Frontend/
+├── index.html                     → Estrutura da página
+├── style.css                      → Estilo dark theme
+└── app.js                         → Lógica do mapa, SignalR e API
 ```
 
 ---
@@ -225,10 +273,9 @@ ZonaVermelha.API/
 ## Próximos passos
 
 - [ ] Autenticação e autorização (JWT)
-- [ ] Frontend web (Angular) consumindo a API e o SignalR
-- [ ] Deploy (API + banco + frontend)
 - [ ] Testes unitários dos serviços
+- [ ] Deploy (API + frontend)
 
 ---
 
-Desenvolvido por [ganhodev](https://github.com/ganhodev) como projeto de estudo em .NET/C#.
+Desenvolvido por [ganhodev](https://github.com/ganhodev) como projeto de estudo em .NET 10/C# com frontend vanilla.
